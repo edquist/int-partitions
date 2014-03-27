@@ -1,0 +1,4 @@
+#!/bin/bash
+
+perl -le 'print int exp rand 9 for 1..8'| ./int-partitions2.py | column -t
+
