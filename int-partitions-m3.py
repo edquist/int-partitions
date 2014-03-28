@@ -3,12 +3,19 @@
 import sys
 import re
 import math
+import itertools
 
 # convenience functions
-def  iceil(x): return int(math.ceil(x))
-def ifloor(x): return int(math.floor(x))
-def iround(x): return int(round(x))
-def zsort(*x): return zip(*sorted(zip(*x)))
+def     sgn(x): return -1 if x < 0 else 1
+def   iceil(x): return int(math.ceil(x))
+def  ifloor(x): return int(math.floor(x))
+def  iround(x): return int(round(x))
+
+# and magic functions  :)
+def    iic(xx): return list(xx) + [itertools.count()]
+def  zsort(*x): return zip(*sorted(zip(*x)))
+def  msort(*x): return zsort(*iic(x))[-1]
+def mmsort(*x): return msort(msort(*x))
 
 ints = [int(line) for line in sys.stdin if re.search(r'^\s*\d+\s*$', line)]
 
@@ -16,27 +23,25 @@ P = 100
 S = sum(ints)
 w = max(len(str(i)) for i in ints)
 
-P_S = float(P)/S
-qq = [n * P_S for n in ints]
-rr = map(iround,qq)
-ii = range(len(qq))
-ee = [rr[i] - qq[i] for i in ii]
+P_S = float(P)/S                       # just compute this once
+qq = [n * P_S for n in ints]           # raw percentages
+rr = map(iround,qq)                    # rounded percentages
+uu = map( iceil,qq)                    # integer ceilings of percentages
+vv = map(ifloor,qq)                    # integer floors of percentages
+ii = range(len(ints))                  # convenience range array
+ee = [rr[i] - qq[i]      for i in ii]  # primary sort by raw error
+zz = [qq[i] * sgn(ee[i]) for i in ii]  # secondary sort to minimize rel. error
+mm = mmsort(ee,zz)                     # reverse index of sorted arrays (magic)
 R = sum(rr)
-U = sum(map(iceil,qq))
-V = sum(map(ifloor,qq))
+U = sum(uu)
+V = sum(vv)
+# Note: U >= (P,R) >= V
 
-_,_,ii2 = zsort(ee,qq,ii)
-_,mm = zsort(ii2,ii)
+# percent partitions (also somewhat magic)
+pp = [ uu[i] if mm[i] <  P-R      else
+       vv[i] if mm[i] >= P-R + n  else
+       rr[i] for i in ii ]
 
-pp = [ iceil(qq[i]) if mm[i] <  P-R      else
-      ifloor(qq[i]) if mm[i] >= P-R + n  else rr[i] for i in ii ]
-
-#import __main__
-#print "---"
-#for v in "R P U V".split():
-#    print "%s: %d" % (v,__main__.__dict__[v])
-#print "---"
-
-for n,slot in zip(ints,pp):
-    print "%*d: %d%%" % (w, n, slot)
+for n,p in zip(ints,pp):
+    print "%*d: %d%%" % (w,n,p)
 
