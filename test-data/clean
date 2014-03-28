@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd "$(dirname "$0")"
+
+rm -rf {2..10}/ {2..10}.*.log
+

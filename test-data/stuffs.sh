@@ -4,7 +4,11 @@ set -e
 cd "$(dirname "$0")"
 
 if mkdir {2..10} 2>/dev/null; then
-  for n in {2..10}; do for x in {1..100}; do perl -le "print int exp rand 9 for 1..$n" > $n/list_$x; done; done
+  for n in {2..10}; do
+  for x in {1..100}; do
+    perl -le "print int exp rand 12 for 1..$n" > $n/list_$x;
+  done;
+  done
 fi
 
 loggen () {
@@ -41,7 +45,9 @@ vs () {
   } | column -t
 
   echo
+}
 
+ma () {
   { echo "n: m1a a1a m2a a2a m1m a1m m2m a2m"
     for x in {2..10}; do
       echo -n "$x: ";
@@ -59,6 +65,46 @@ vs () {
   echo
 }
 
+ma2 () {
+  echo "max-max, max-avg, avg-max, avg-avg:"
+  for ((i=1;i<=$#;i++)); do
+    echo "  $i = ${!i}"
+  done
+  echo
+  { # n: lbl-mm lbl-ma lbl-am lbl-aa
+    awk '
+      BEGIN {
+        printf "n:"
+        for (i=1;i<ARGC;i++) { printf " %d-mm", i }
+        for (i=1;i<ARGC;i++) { printf " %d-ma", i }
+        for (i=1;i<ARGC;i++) { printf " %d-am", i }
+        for (i=1;i<ARGC;i++) { printf " %d-aa", i }
+        printf "\n"
+      }' "$@"
+    for x in {2..10}; do
+      ll=( "${@/#/$x.}" )
+      ll=( "${ll[@]/%/.log}" )
+      echo -n "$x: ";
+      awk '
+        { m[ARGIND] += $1 }
+        { a[ARGIND] += $2 }
+        $1 > mm[ARGIND] { mm[ARGIND] = $1 }
+        $2 > am[ARGIND] { am[ARGIND] = $2 }
+        END {
+          for (i=1;i<ARGC;i++) { printf " %.3f", mm[i]   }
+          for (i=1;i<ARGC;i++) { printf " %.3f", m[i]/NR }
+          for (i=1;i<ARGC;i++) { printf " %.3f", am[i]   }
+          for (i=1;i<ARGC;i++) { printf " %.3f", a[i]/NR }
+          printf "\n"
+        }
+        ' "${ll[@]}"
+    done
+  } | column -t
+}
+
 vs rounder intp
 vs intp m3
 vs rounder m3
+
+ma2 rounder intp m3
+
