@@ -11,7 +11,7 @@ def   iceil(x): return int(math.ceil(x))
 def  ifloor(x): return int(math.floor(x))
 def  iround(x): return int(round(x))
 
-# and magic functions  :)
+# and magic functions, also for convenience  :)
 def    iic(xx): return list(xx) + [itertools.count()]
 def  zsort(*x): return zip(*sorted(zip(*x)))
 def  msort(*x): return zsort(*iic(x))[-1]
@@ -22,7 +22,7 @@ ints = [int(line) for line in sys.stdin if re.search(r'^\s*\d+\s*$', line)]
 P = 100
 S = sum(ints)
 N = len(ints)
-w = max(len(str(d)) for d in ints)
+w = max(len(str(d)) for d in ints)     # for print formatting
 
 P_S = float(P)/S                       # just compute this once
 qq = [d * P_S for d in ints]           # raw percentages
