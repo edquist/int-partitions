@@ -21,10 +21,11 @@ ints = [int(line) for line in sys.stdin if re.search(r'^\s*\d+\s*$', line)]
 
 P = 100
 S = sum(ints)
-w = max(len(str(i)) for i in ints)
+N = len(ints)
+w = max(len(str(d)) for d in ints)
 
 P_S = float(P)/S                       # just compute this once
-qq = [n * P_S for n in ints]           # raw percentages
+qq = [d * P_S for d in ints]           # raw percentages
 rr = map(iround,qq)                    # rounded percentages
 uu = map( iceil,qq)                    # integer ceilings of percentages
 vv = map(ifloor,qq)                    # integer floors of percentages
@@ -39,9 +40,19 @@ V = sum(vv)
 
 # percent partitions (also somewhat magic)
 pp = [ uu[i] if mm[i] <  P-R      else
-       vv[i] if mm[i] >= P-R + n  else
+       vv[i] if mm[i] >= P-R + N  else
        rr[i] for i in ii ]
 
-for n,p in zip(ints,pp):
-    print "%*d: %d%%" % (w,n,p)
+for d,p in zip(ints,pp):
+    print "%*d: %d%%" % (w,d,p)
+
+
+debug = False
+
+if debug:
+    print "---"
+    import __main__
+    for v in "qq rr uu vv pp ee zz mm R U V P S".split():
+        print v + ":", __main__.__dict__[v]
+    print "---"
 
