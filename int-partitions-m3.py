@@ -29,14 +29,14 @@ qq = [d * P_S for d in ints]           # raw percentages
 rr = map(iround,qq)                    # rounded percentages
 uu = map( iceil,qq)                    # integer ceilings of percentages
 vv = map(ifloor,qq)                    # integer floors of percentages
-ii = range(len(ints))                  # convenience range array
+ii = range(N)                          # convenience range array
 ee = [rr[i] - qq[i]      for i in ii]  # primary sort by raw error
 zz = [qq[i] * sgn(ee[i]) for i in ii]  # secondary sort to minimize rel. error
 mm = mmsort(ee,zz)                     # reverse index of sorted arrays (magic)
 R = sum(rr)
 U = sum(uu)
 V = sum(vv)
-# Note: U >= (P,R) >= V
+# Note: V <= (P,R) <= U <= V + N
 
 # percent partitions (also somewhat magic)
 pp = [ uu[i] if mm[i] <  P-R      else
@@ -48,6 +48,7 @@ for d,p in zip(ints,pp):
 
 
 debug = False
+#debug = True
 
 if debug:
     print "---"

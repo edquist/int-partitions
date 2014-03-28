@@ -8,7 +8,7 @@ ints = [int(line) for line in sys.stdin if re.search(r'^\s*\d+\s*$', line)]
 P = 100
 t = 0
 s = sum(ints)
-w = max(len(str(i)) for i in ints)
+w = max(len(str(n)) for n in ints)
 
 for n in ints:
     t += n
