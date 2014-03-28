@@ -53,7 +53,7 @@ debug = False
 if debug:
     print "---"
     import __main__
-    for v in "qq rr uu vv pp ee zz mm R U V P S".split():
+    for v in "qq rr uu vv pp ee zz mm N P R U V S".split():
         print v + ":", __main__.__dict__[v]
     print "---"
 
