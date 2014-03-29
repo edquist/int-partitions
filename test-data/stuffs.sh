@@ -91,10 +91,10 @@ ma2 () {
         $1 > mm[ARGIND] { mm[ARGIND] = $1 }
         $2 > am[ARGIND] { am[ARGIND] = $2 }
         END {
-          for (i=1;i<ARGC;i++) { printf " %.3f", mm[i]   }
-          for (i=1;i<ARGC;i++) { printf " %.3f", m[i]/NR }
-          for (i=1;i<ARGC;i++) { printf " %.3f", am[i]   }
-          for (i=1;i<ARGC;i++) { printf " %.3f", a[i]/NR }
+          for (i=1;i<ARGC;i++) { printf " %s", mm[i]   }
+          for (i=1;i<ARGC;i++) { printf " %f", m[i]/NR }
+          for (i=1;i<ARGC;i++) { printf " %s", am[i]   }
+          for (i=1;i<ARGC;i++) { printf " %f", a[i]/NR }
           printf "\n"
         }
         ' "${ll[@]}"
