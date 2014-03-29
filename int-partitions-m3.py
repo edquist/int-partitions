@@ -20,12 +20,11 @@ def mmsort(*x): return msort(msort(*x))
 ints = [int(line) for line in sys.stdin if re.search(r'^\s*\d+\s*$', line)]
 
 P = 100
-S = sum(ints)
+S = float(sum(ints))
 N = len(ints)
 w = max(len(str(d)) for d in ints)     # for print formatting
 
-P_S = float(P)/S                       # just compute this once
-qq = [d * P_S for d in ints]           # raw percentages
+qq = [d * P / S for d in ints]         # raw percentages
 rr = map(iround,qq)                    # rounded percentages
 uu = map( iceil,qq)                    # integer ceilings of percentages
 vv = map(ifloor,qq)                    # integer floors of percentages
