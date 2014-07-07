@@ -26,13 +26,15 @@ def mmsort(*x): return msort(msort(*x))
 def ints2qq(ints, flags, P):
     int_flags = zip(ints,flags)
 
-    S  = sum(ints)
-    S0 = sum( d for d,f in int_flags if f is None    )
-    S2 = sum( d for d,f in int_flags if f is not "@" )
+    S  = sum( d for d,f in int_flags if f is not "%"       )
+    P -= sum( d for d,f in int_flags if f is "%"           )
+    S0 = sum( d for d,f in int_flags if f is None          )
+    S2 = sum( d for d,f in int_flags if f not in ("@","%") )
     SP  = float(P)/S
     SP2 = float(P)*S2/S/S0
 
     qq = [ 0       if flag is "!" else
+           d       if flag is "%" else
            d * SP  if flag is "@" else
            d * SP2 for d,flag in int_flags ]
 
@@ -79,13 +81,15 @@ def hms2s(x):
 
 def get_ints(seq, rx):
     for line in seq:
+        if line.startswith("#"):
+            continue
         m = re.search(rx,line)
         if m:
-            flag,hms = m.groups()
-            yield line, hms2s(hms), flag
+            flag1,hms,flag2 = m.groups()
+            yield line, hms2s(hms), flag1 or flag2
 
 def process_lines(seq):
-    rx = r'([@!])?(\d+(?:\d+)*)'
+    rx = r'([@!%])?(\d+(?:\d+)*)([@!%])?'
     lines,ints,flags = zip(*get_ints(seq, rx))
     pp = ints2pp(ints, flags)
     return [ re.sub(rx, '%d%%' % p, line, 1) for line,p in zip(lines,pp) ]
