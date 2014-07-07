@@ -17,12 +17,28 @@ def  zsort(*x): return zip(*sorted(zip(*x)))
 def  msort(*x): return zsort(*iic(x))[-1]
 def mmsort(*x): return msort(msort(*x))
 
-def ints2pp(ints, P=100):
+def ints2pp(ints, flags=None, P=100):
     S = sum(ints)
     N = len(ints)
 
-    P_S = float(P)/S                         # just compute this once
-    qq = [d * P_S for d in ints]             # raw percentages
+#   if not flags:
+#       flags = [None] * N
+#
+#   int_flags = zip(ints,flags)
+
+    P_S  = float(P)/S                        # just compute this once
+
+    if flags:
+        S0 = sum( d for d,f in zip(ints,flags) if f is None )
+        S2 = sum( d for d,f in zip(ints,flags) if f is not "@" )
+        P_S2 = float(P)*S2/S/S0
+        qq = [ 0        if f is "!" else
+               d * P_S  if f is "@" else
+               d * P_S2 for d,f in zip(ints,flags) ]
+    else:
+        qq = [d * P_S for d in ints]         # raw percentages
+
+    print "sum(qq) = %.3f" % sum(qq)
     rr = map(iround,qq)                      # rounded percentages
     uu = map( iceil,qq)                      # integer ceilings of percentages
     vv = map(ifloor,qq)                      # integer floors of percentages
@@ -55,12 +71,13 @@ def get_ints(seq, rx):
     for line in seq:
         m = re.search(rx,line)
         if m:
-            yield line, hms2s(m.groups()[0])
+            flag,hms = m.groups()
+            yield line, hms2s(hms), flag
 
 def process_lines(seq):
-    rx = r'(\d+(?:\d+)*)'
-    lines,ints = zip(*get_ints(seq, rx))
-    pp = ints2pp(ints)
+    rx = r'([@!])?(\d+(?:\d+)*)'
+    lines,ints,flags = zip(*get_ints(seq, rx))
+    pp = ints2pp(ints, flags)
     return [ re.sub(rx, '%d%%' % p, line, 1) for line,p in zip(lines,pp) ]
 
 for line in process_lines(sys.stdin):
