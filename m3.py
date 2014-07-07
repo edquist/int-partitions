@@ -30,9 +30,9 @@ def ints2pp(ints, P=100):
     ee = [ rr[i] - qq[i]      for i in ii ]  # primary sort by raw error
     zz = [ qq[i] * sgn(ee[i]) for i in ii ]  # secondary sort, minimize rel err
     mm = mmsort(ee,zz)  # magic!             # reverse index of sort-by arrays
-    R = sum(rr)                              # sum of rounded percents
-    U = sum(uu)                              # sum of percent ceilings
-    V = sum(vv)                              # sum of percent floors
+    R = sum(rr)
+    U = sum(uu)
+    V = sum(vv)
     # Note: V <= (P,R) <= U <= V + N
 
     # percent partitions (also somewhat magic)
