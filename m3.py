@@ -13,7 +13,6 @@ def  iround(x): return int(round(x))
 
 # and magic functions, also for convenience  :)
 def    iic(xx): return list(xx) + [itertools.count()]
-#def   iic(xx): return xx + (itertools.count(),)
 def  zsort(*x): return zip(*sorted(zip(*x)))
 def  msort(*x): return zsort(*iic(x))[-1]
 def mmsort(*x): return msort(msort(*x))
@@ -31,9 +30,9 @@ def ints2pp(ints, P=100):
     ee = [rr[i] - qq[i]      for i in ii]  # primary sort by raw error
     zz = [qq[i] * sgn(ee[i]) for i in ii]  # secondary sort to minimize rel err
     mm = mmsort(ee,zz)  # magic!           # reverse index of sort-by arrays
-    R = sum(rr)
-    U = sum(uu)
-    V = sum(vv)
+    R = sum(rr)                            # sum of rounded percents
+    U = sum(uu)                            # sum of percent ceilings
+    V = sum(vv)                            # sum of percent floors
     # Note: V <= (P,R) <= U <= V + N
 
     # percent partitions (also somewhat magic)
@@ -52,17 +51,16 @@ def print_ints_pp(ints):
 def hms2s(x):
     return sum(int(n) * 60**i for i,n in enumerate(reversed(x.split(':'))))
 
+def get_ints(seq, rx):
+    for line in seq:
+        m = re.search(rx,line)
+        if m:
+            yield line, hms2s(m.groups()[0])
+
 def process_lines(seq):
     rx = r'(\d+(?:\d+)*)'
-    def get_lines(seq):
-        for line in seq:
-            m = re.search(rx,line)
-            if m:
-                yield line, hms2s(m.groups()[0])
-
-    lines,ints = zip(*get_lines(seq))
+    lines,ints = zip(*get_ints(seq, rx))
     pp = ints2pp(ints)
-
     return [re.sub(rx, '%d%%' % p, line, 1) for line,p in zip(lines,pp)]
 
 for line in process_lines(sys.stdin):
