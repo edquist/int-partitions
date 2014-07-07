@@ -95,6 +95,7 @@ def process_lines(seq):
     return [ re.sub(rx, '%d%%' % p, line, 1) for line,p in zip(lines,pp) ]
 
 if __name__ == "__main__":
-    for line in process_lines(sys.stdin):
+    inf = open(sys.argv[1]) if sys.argv[1:] else sys.stdin
+    for line in process_lines(inf):
         print line.rstrip()
 
