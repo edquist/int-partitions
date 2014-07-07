@@ -21,24 +21,19 @@ def ints2pp(ints, flags=None, P=100):
     S = sum(ints)
     N = len(ints)
 
-#   if not flags:
-#       flags = [None] * N
-#
-#   int_flags = zip(ints,flags)
+    if not flags:
+        flags = [None] * N
 
-    P_S  = float(P)/S                        # just compute this once
+    int_flags = zip(ints,flags)
 
-    if flags:
-        S0 = sum( d for d,f in zip(ints,flags) if f is None )
-        S2 = sum( d for d,f in zip(ints,flags) if f is not "@" )
-        P_S2 = float(P)*S2/S/S0
-        qq = [ 0        if f is "!" else
-               d * P_S  if f is "@" else
-               d * P_S2 for d,f in zip(ints,flags) ]
-    else:
-        qq = [d * P_S for d in ints]         # raw percentages
+    S0 = sum( d for d,f in int_flags if f is None    )
+    S2 = sum( d for d,f in int_flags if f is not "@" )
 
-    print "sum(qq) = %.3f" % sum(qq)
+    qq = [ 0               if f is "!" else
+           d * float(P)/S  if f is "@" else
+           d * float(P)*S2/S/S0 for d,f in int_flags ]
+
+#   qq = [ d * float(P)/S for d in ints ]    # raw percentages
     rr = map(iround,qq)                      # rounded percentages
     uu = map( iceil,qq)                      # integer ceilings of percentages
     vv = map(ifloor,qq)                      # integer floors of percentages
