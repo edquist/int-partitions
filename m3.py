@@ -17,12 +17,15 @@ def  zsort(*x): return zip(*sorted(zip(*x)))
 def  msort(*x): return zsort(*iic(x))[-1]
 def mmsort(*x): return msort(msort(*x))
 
-def ints2pp(ints, flags=None, P=100):
+
+#  flag adjusted raw percentage:
+#  !    -> 0% (to be amortized over non-flag items)
+#  @    -> % based on total (use for leave)
+#  None -> amortized % for regular items
+
+def ints2qq(ints, flags, P):
     S = sum(ints)
     N = len(ints)
-
-    if not flags:
-        flags = [None] * N
 
     int_flags = zip(ints,flags)
 
@@ -33,7 +36,17 @@ def ints2pp(ints, flags=None, P=100):
            d * float(P)/S  if f is "@" else
            d * float(P)*S2/S/S0 for d,f in int_flags ]
 
-#   qq = [ d * float(P)/S for d in ints ]    # raw percentages
+    return qq
+
+def ints2pp(ints, flags=None, P=100):
+    N = len(ints)
+
+    if flags:
+        qq = ints2qq(ints,flags,P)           # flag-adjusted raw percentages
+    else:
+        S  = sum(ints)
+        qq = [ float(d*P)/S for d in ints ]  # raw percentages
+
     rr = map(iround,qq)                      # rounded percentages
     uu = map( iceil,qq)                      # integer ceilings of percentages
     vv = map(ifloor,qq)                      # integer floors of percentages
@@ -41,9 +54,9 @@ def ints2pp(ints, flags=None, P=100):
     ee = [ rr[i] - qq[i]      for i in ii ]  # primary sort by raw error
     zz = [ qq[i] * sgn(ee[i]) for i in ii ]  # secondary sort, minimize rel err
     mm = mmsort(ee,zz)  # magic!             # reverse index of sort-by arrays
-    R = sum(rr)
-    U = sum(uu)
-    V = sum(vv)
+    R = sum(rr)                              # rounded total
+    U = sum(uu)                              # ceiling total
+    V = sum(vv)                              # floor total
     # Note: V <= (P,R) <= U <= V + N
 
     # percent partitions (also somewhat magic)
@@ -75,7 +88,7 @@ def process_lines(seq):
     pp = ints2pp(ints, flags)
     return [ re.sub(rx, '%d%%' % p, line, 1) for line,p in zip(lines,pp) ]
 
-for line in process_lines(sys.stdin):
-    print line.rstrip()
-
+if __name__ == "__main__":
+    for line in process_lines(sys.stdin):
+        print line.rstrip()
 
