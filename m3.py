@@ -24,17 +24,19 @@ def mmsort(*x): return msort(msort(*x))
 #  None -> amortized % for regular items
 
 def ints2qq(ints, flags, P):
-    S = sum(ints)
-    N = len(ints)
-
     int_flags = zip(ints,flags)
 
+    S  = sum(ints)
     S0 = sum( d for d,f in int_flags if f is None    )
     S2 = sum( d for d,f in int_flags if f is not "@" )
+    SP  = float(P)/S
+    SP2 = float(P)*S2/S/S0
 
-    qq = [ 0               if f is "!" else
-           d * float(P)/S  if f is "@" else
-           d * float(P)*S2/S/S0 for d,f in int_flags ]
+    qq = [ 0       if flag is "!" else
+           d * SP  if flag is "@" else
+           d * SP2 for d,flag in int_flags ]
+
+    #print "sum(qq) = %.3f" % sum(qq)
 
     return qq
 
