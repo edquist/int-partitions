@@ -76,12 +76,6 @@ def ints2pp(ints, flags=None, P=100):
 
     return pp
 
-def print_ints_pp(ints):
-    pp = ints2pp(ints)
-    w  = max( len(str(d)) for d in ints )
-    for d,p in zip(ints,pp):
-        print "%*d: %d%%" % (w,d,p)
-
 def hms2s(x):
     return sum( int(n) * 60**i for i,n in enumerate(reversed(x.split(':'))) )
 
