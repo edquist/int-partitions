@@ -20,12 +20,11 @@ def mmsort(*x): return msort(msort(*x))
 ints = [int(line) for line in sys.stdin if re.search(r'^\s*\d+\s*$', line)]
 
 P = 100
-S = sum(ints)
+S = float(sum(ints))
 N = len(ints)
 w = max(len(str(d)) for d in ints)     # for print formatting
 
-P_S = float(P)/S                       # just compute this once
-qq = [d * P_S for d in ints]           # raw percentages
+qq = [d * P / S for d in ints]         # raw percentages
 rr = map(iround,qq)                    # rounded percentages
 uu = map( iceil,qq)                    # integer ceilings of percentages
 vv = map(ifloor,qq)                    # integer floors of percentages
@@ -34,9 +33,6 @@ ee = [rr[i] - qq[i]      for i in ii]  # primary sort by raw error
 zz = [qq[i] * sgn(ee[i]) for i in ii]  # secondary sort to minimize rel. error
 mm = mmsort(ee,zz)  # magic!           # reverse index of sort by arrays
 R = sum(rr)
-U = sum(uu)
-V = sum(vv)
-# Note: V <= (P,R) <= U <= V + N
 
 # percent partitions (also somewhat magic)
 pp = [ uu[i] if mm[i] <  P-R      else
@@ -45,15 +41,4 @@ pp = [ uu[i] if mm[i] <  P-R      else
 
 for d,p in zip(ints,pp):
     print "%*d: %d%%" % (w,d,p)
-
-
-debug = False
-#debug = True
-
-if debug:
-    print "---"
-    import __main__
-    for v in "qq rr uu vv pp ee zz mm N P R U V S".split():
-        print v + ":", __main__.__dict__[v]
-    print "---"
 

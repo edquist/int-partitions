@@ -5,6 +5,8 @@ import re
 import math
 import itertools
 
+NONZEROS_STAY_NONZEROS = True
+
 # convenience functions
 def     sgn(x): return -1 if x < 0 else 1
 def   iceil(x): return int(math.ceil(x))
@@ -17,22 +19,34 @@ def  zsort(*x): return zip(*sorted(zip(*x)))
 def  msort(*x): return zsort(*iic(x))[-1]
 def mmsort(*x): return msort(msort(*x))
 
+def fail(msg):
+    print >>sys.stderr, msg
+    sys.exit(1)
 
 #  flag adjusted raw percentage:
-#  !    -> 0% (to be amortized over non-flag items)
-#  @    -> % based on total (use for leave)
+#  !    -> 0% (to be amortized over non-flag items). only relevant with "@"
+#  @    -> % based on total, including "!" values (use for leave)
+#  %    -> fixed percentage, but doesn't contribute a number for "@"
+#  +    -> locked 1%, but value still goes toward total for the sake of "@"
 #  None -> amortized % for regular items
 
 def ints2qq(ints, flags, P):
     int_flags = zip(ints,flags)
 
-    S  = sum(ints)
-    S0 = sum( d for d,f in int_flags if f is None    )
-    S2 = sum( d for d,f in int_flags if f is not "@" )
-    SP  = float(P)/S
-    SP2 = float(P)*S2/S/S0
+    S   = sum( d for d,f in int_flags if f is not "%"       )
+    P  -= sum( d for d,f in int_flags if f is "%"           )
+    P  -= sum( 1 for d,f in int_flags if f is "+"           )
+    S0  = sum( d for d,f in int_flags if f is None          )
+    S2  = sum( d for d,f in int_flags if f not in ("@","%") )
+    SP  = float(P)/S if S  else 0
+    SP2 = SP*S2/S0   if S0 else 0
+
+    if P < 0:
+        fail("this doesn't add up...")
 
     qq = [ 0       if flag is "!" else
+           1       if flag is "+" else
+           d       if flag is "%" else
            d * SP  if flag is "@" else
            d * SP2 for d,flag in int_flags ]
 
@@ -48,6 +62,7 @@ def ints2pp(ints, flags=None, P=100):
     else:
         S  = sum(ints)
         qq = [ float(d*P)/S for d in ints ]  # raw percentages
+        flags = [None] * N
 
     rr = map(iround,qq)                      # rounded percentages
     uu = map( iceil,qq)                      # integer ceilings of percentages
@@ -66,31 +81,35 @@ def ints2pp(ints, flags=None, P=100):
            vv[i] if mm[i] >= P-R + N  else
            rr[i] for i in ii ]
 
-    return pp
+    # guarantee non-zero items produce non-zero percents
+    if NONZEROS_STAY_NONZEROS:
+        f2 = tuple( '+' if qq[i] > 0 and pp[i] == 0 else flags[i] for i in ii )
+        if f2 != flags:
+            pp = ints2pp(ints, f2, P)
 
-def print_ints_pp(ints):
-    pp = ints2pp(ints)
-    w  = max( len(str(d)) for d in ints )
-    for d,p in zip(ints,pp):
-        print "%*d: %d%%" % (w,d,p)
+    return pp
 
 def hms2s(x):
     return sum( int(n) * 60**i for i,n in enumerate(reversed(x.split(':'))) )
 
 def get_ints(seq, rx):
     for line in seq:
+        if line.startswith("#"):
+            continue
         m = re.search(rx,line)
         if m:
-            flag,hms = m.groups()
-            yield line, hms2s(hms), flag
+            flag1,hms,flag2 = m.groups()
+            yield line, hms2s(hms), flag1 or flag2
 
 def process_lines(seq):
-    rx = r'([@!])?(\d+(?:\d+)*)'
+    rx = r'([@!%])?(\d+(?::\d+)*)([@!%])?'
     lines,ints,flags = zip(*get_ints(seq, rx))
     pp = ints2pp(ints, flags)
-    return [ re.sub(rx, '%d%%' % p, line, 1) for line,p in zip(lines,pp) ]
+    return [ re.sub(rx, '%d%%' % p, line, 1)
+             for line,p,flag in zip(lines,pp,flags) if flag is not "!" ]
 
 if __name__ == "__main__":
-    for line in process_lines(sys.stdin):
+    inf = open(sys.argv[1]) if sys.argv[1:] else sys.stdin
+    for line in process_lines(inf):
         print line.rstrip()
 
