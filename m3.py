@@ -11,6 +11,7 @@ class Cfg:
     show_orig     = False
     keep_nonzeros = True
     P             = 100
+    debug         = False
 
 # convenience functions
 def     sgn(x): return -1 if x < 0 else 1
@@ -27,6 +28,11 @@ def mmsort(*x): return msort(msort(*x))
 def fail(msg):
     print >>sys.stderr, msg
     sys.exit(1)
+
+def pdf(h):
+    m = max(map(len,h.keys()))
+    for k in sorted(h.keys()):
+        print " %*s => %s" % (m, k, h[k])
 
 #  flag adjusted raw percentage:
 #  !    -> 0% (to be amortized over non-flag items). only relevant with "@"
@@ -87,6 +93,10 @@ def ints2pp(ints, flags=None, ops=Cfg()):
            vv[i] if mm[i] >= P-R + N  else
            rr[i] for i in ii ]
 
+    if ops.debug:
+        print "-------"
+        pdf(vars())
+
     # guarantee non-zero items produce non-zero percents
     if ops.keep_nonzeros:
         f2 = tuple( '+' if qq[i] > 0 and pp[i] == 0 else flags[i] for i in ii )
@@ -117,11 +127,12 @@ def process_lines(seq, ops=Cfg()):
 
 def main(argv):
     cfg = Cfg()
-    ops,args = getopt.getopt(argv, 'znp:')
+    ops,args = getopt.getopt(argv, 'dznp:')
     for op,val in ops:
         if   op == '-z': cfg.keep_nonzeros = False
         elif op == '-n': cfg.show_orig     = True
         elif op == '-p': cfg.P             = int(val)
+        elif op == '-d': cfg.debug         = True
 
     inf = open(args[0]) if args else sys.stdin
     for line in process_lines(inf, cfg):
@@ -134,6 +145,7 @@ def usage():
     print "  -z     allow non-zero values to go to zero percent"
     print "  -n     show original numbers along with percents"
     print "  -p N   partition values into a total of N percent (default=100)"
+    print "  -d     debug mode"
     print
 
 if __name__ == "__main__":
