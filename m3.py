@@ -26,10 +26,10 @@ def mmsort(*x): return msort(msort(*x))
 def ints2qq(ints, flags, P):
     int_flags = zip(ints,flags)
 
-    S  = sum( d for d,f in int_flags if f is not "%"       )
-    P -= sum( d for d,f in int_flags if f is "%"           )
-    S0 = sum( d for d,f in int_flags if f is None          )
-    S2 = sum( d for d,f in int_flags if f not in ("@","%") )
+    S   = sum( d for d,f in int_flags if f is not "%"       )
+    P  -= sum( d for d,f in int_flags if f is "%"           )
+    S0  = sum( d for d,f in int_flags if f is None          )
+    S2  = sum( d for d,f in int_flags if f not in ("@","%") )
     SP  = float(P)/S
     SP2 = float(P)*S2/S/S0
 
