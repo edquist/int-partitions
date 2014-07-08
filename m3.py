@@ -17,6 +17,9 @@ def  zsort(*x): return zip(*sorted(zip(*x)))
 def  msort(*x): return zsort(*iic(x))[-1]
 def mmsort(*x): return msort(msort(*x))
 
+def fail(msg):
+    print >>sys.stderr, msg
+    sys.exit(1)
 
 #  flag adjusted raw percentage:
 #  !    -> 0% (to be amortized over non-flag items)
@@ -30,8 +33,11 @@ def ints2qq(ints, flags, P):
     P  -= sum( d for d,f in int_flags if f is "%"           )
     S0  = sum( d for d,f in int_flags if f is None          )
     S2  = sum( d for d,f in int_flags if f not in ("@","%") )
-    SP  = float(P)/S
-    SP2 = float(P)*S2/S/S0
+    SP  = float(P)/S if S  else 0
+    SP2 = SP*S2/S0   if S0 else 0
+
+    if P < 0:
+        fail("this doesn't add up...")
 
     qq = [ 0       if flag is "!" else
            d       if flag is "%" else
