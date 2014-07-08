@@ -109,6 +109,9 @@ def process_lines(seq):
              for line,p,flag in zip(lines,pp,flags) if flag is not "!" ]
 
 if __name__ == "__main__":
+    if sys.argv[1:] and sys.argv[1] == '-z':
+        NONZEROS_STAY_NONZEROS = False
+        sys.argv[1:2] = []
     inf = open(sys.argv[1]) if sys.argv[1:] else sys.stdin
     for line in process_lines(inf):
         print line.rstrip()
