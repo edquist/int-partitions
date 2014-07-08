@@ -82,10 +82,9 @@ def ints2pp(ints, flags=None, P=100):
 
     # guarantee non-zero items produce non-zero percents
     if NONZEROS_STAY_NONZEROS:
-        flags2 = tuple(
-            '+' if ints[i] > 0 and pp[i] == 0 else flags[i] for i in ii )
-        if flags2 != flags:
-            pp = ints2pp(ints, flags2, P)
+        f2 = tuple( '+' if qq[i] > 0 and pp[i] == 0 else flags[i] for i in ii )
+        if f2 != flags:
+            pp = ints2pp(ints, f2, P)
 
     return pp
 
