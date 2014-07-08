@@ -13,12 +13,17 @@ fi
 
 loggen () {
   if ! ls | grep -q "\.$2\.log$"; then
-    for x in {2..10}; do for n in $(ls -v $x); do ../$1 < $x/$n | ../stats.py ; done >$x.$2.log & done; wait
+    for x in {2..10}; do
+      for n in $(ls -v $x); do
+        ../$1 < $x/$n | ../stats.py
+      done >$x.$2.log &
+    done; wait
   fi
 }
 
 loggen int-partitions-basic.py intp
 loggen rounder.py rounder
+loggen rounder2.py rounder2
 loggen int-partitions-m3.py m3
 
 # for x in {2..10}; do for n in $(ls -v $x); do ../int-partitions-basic.py < $x/$n | ../stats.py ; done >$x.intp.log & done; wait
@@ -105,6 +110,7 @@ ma2 () {
 vs rounder intp
 vs intp m3
 vs rounder m3
+vs rounder rounder2
 
 ma2 rounder intp m3
 
