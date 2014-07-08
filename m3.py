@@ -92,7 +92,8 @@ def process_lines(seq):
     rx = r'([@!%])?(\d+(?::\d+)*)([@!%])?'
     lines,ints,flags = zip(*get_ints(seq, rx))
     pp = ints2pp(ints, flags)
-    return [ re.sub(rx, '%d%%' % p, line, 1) for line,p in zip(lines,pp) ]
+    return [ re.sub(rx, '%d%%' % p, line, 1)
+             for line,p,flag in zip(lines,pp,flags) if flag is not "!" ]
 
 if __name__ == "__main__":
     inf = open(sys.argv[1]) if sys.argv[1:] else sys.stdin
