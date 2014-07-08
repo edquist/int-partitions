@@ -2,10 +2,15 @@
 
 import sys
 import re
+import os
 import math
 import itertools
+import getopt
 
-NONZEROS_STAY_NONZEROS = True
+class Cfg:
+    show_orig     = False
+    keep_nonzeros = True
+    P             = 100
 
 # convenience functions
 def     sgn(x): return -1 if x < 0 else 1
@@ -54,8 +59,9 @@ def ints2qq(ints, flags, P):
 
     return qq
 
-def ints2pp(ints, flags=None, P=100):
+def ints2pp(ints, flags=None, ops=Cfg()):
     N = len(ints)
+    P = ops.P
 
     if flags:
         qq = ints2qq(ints,flags,P)           # flag-adjusted raw percentages
@@ -82,10 +88,10 @@ def ints2pp(ints, flags=None, P=100):
            rr[i] for i in ii ]
 
     # guarantee non-zero items produce non-zero percents
-    if NONZEROS_STAY_NONZEROS:
+    if ops.keep_nonzeros:
         f2 = tuple( '+' if qq[i] > 0 and pp[i] == 0 else flags[i] for i in ii )
         if f2 != flags:
-            pp = ints2pp(ints, f2, P)
+            pp = ints2pp(ints, f2, ops)
 
     return pp
 
@@ -101,18 +107,38 @@ def get_ints(seq, rx):
             flag1,hms,flag2 = m.groups()
             yield line, hms2s(hms), flag1 or flag2
 
-def process_lines(seq):
+def process_lines(seq, ops=Cfg()):
     rx = r'([@!%])?(\d+(?::\d+)*)([@!%])?'
+    repl = r'\2: %d%%' if ops.show_orig else r'%d%%'
     lines,ints,flags = zip(*get_ints(seq, rx))
-    pp = ints2pp(ints, flags)
-    return [ re.sub(rx, '%d%%' % p, line, 1)
+    pp = ints2pp(ints, flags, ops)
+    return [ re.sub(rx, repl % p, line, 1)
              for line,p,flag in zip(lines,pp,flags) if flag is not "!" ]
 
-if __name__ == "__main__":
-    if sys.argv[1:] and sys.argv[1] == '-z':
-        NONZEROS_STAY_NONZEROS = False
-        sys.argv[1:2] = []
-    inf = open(sys.argv[1]) if sys.argv[1:] else sys.stdin
-    for line in process_lines(inf):
+def main(argv):
+    cfg = Cfg()
+    ops,args = getopt.getopt(argv, 'znp:')
+    for op,val in ops:
+        if   op == '-z': cfg.keep_nonzeros = False
+        elif op == '-n': cfg.show_orig     = True
+        elif op == '-p': cfg.P             = int(val)
+
+    inf = open(args[0]) if args else sys.stdin
+    for line in process_lines(inf, cfg):
         print line.rstrip()
+
+def usage():
+    print "usage: %s [options] [file]" % os.path.basename(sys.argv[0])
+    print
+    print "options:"
+    print "  -z     allow non-zero values to go to zero percent"
+    print "  -n     show original numbers along with percents"
+    print "  -p N   partition values into a total of N percent (default=100)"
+    print
+
+if __name__ == "__main__":
+    try:
+        main(sys.argv[1:])
+    except getopt.GetoptError:
+        usage()
 
