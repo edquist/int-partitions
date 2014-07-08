@@ -89,7 +89,7 @@ def get_ints(seq, rx):
             yield line, hms2s(hms), flag1 or flag2
 
 def process_lines(seq):
-    rx = r'([@!%])?(\d+(?:\d+)*)([@!%])?'
+    rx = r'([@!%])?(\d+(?::\d+)*)([@!%])?'
     lines,ints,flags = zip(*get_ints(seq, rx))
     pp = ints2pp(ints, flags)
     return [ re.sub(rx, '%d%%' % p, line, 1) for line,p in zip(lines,pp) ]
