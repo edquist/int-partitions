@@ -76,6 +76,11 @@ def ints2pp(ints, flags=None, P=100):
            vv[i] if mm[i] >= P-R + N  else
            rr[i] for i in ii ]
 
+    # guarantee non-zero items produce non-zero percents
+    flags2 = tuple('+' if ints[i] > 0 and pp[i] == 0 else flags[i] for i in ii)
+    if flags2 != flags:
+        pp = ints2pp(ints, flags2, P)
+
     return pp
 
 def hms2s(x):
