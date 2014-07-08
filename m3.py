@@ -22,8 +22,10 @@ def fail(msg):
     sys.exit(1)
 
 #  flag adjusted raw percentage:
-#  !    -> 0% (to be amortized over non-flag items)
-#  @    -> % based on total (use for leave)
+#  !    -> 0% (to be amortized over non-flag items). only relevant with "@"
+#  @    -> % based on total, including "!" values (use for leave)
+#  %    -> fixed percentage, but doesn't contribute a number for "@"
+#  +    -> locked 1%, but value still goes toward total for the sake of "@"
 #  None -> amortized % for regular items
 
 def ints2qq(ints, flags, P):
