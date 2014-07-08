@@ -5,6 +5,8 @@ import re
 import math
 import itertools
 
+NONZEROS_STAY_NONZEROS = True
+
 # convenience functions
 def     sgn(x): return -1 if x < 0 else 1
 def   iceil(x): return int(math.ceil(x))
@@ -79,9 +81,11 @@ def ints2pp(ints, flags=None, P=100):
            rr[i] for i in ii ]
 
     # guarantee non-zero items produce non-zero percents
-    flags2 = tuple('+' if ints[i] > 0 and pp[i] == 0 else flags[i] for i in ii)
-    if flags2 != flags:
-        pp = ints2pp(ints, flags2, P)
+    if NONZEROS_STAY_NONZEROS:
+        flags2 = tuple(
+            '+' if ints[i] > 0 and pp[i] == 0 else flags[i] for i in ii )
+        if flags2 != flags:
+            pp = ints2pp(ints, flags2, P)
 
     return pp
 
