@@ -62,6 +62,7 @@ def ints2pp(ints, flags=None, P=100):
     else:
         S  = sum(ints)
         qq = [ float(d*P)/S for d in ints ]  # raw percentages
+        flags = [None] * N
 
     rr = map(iround,qq)                      # rounded percentages
     uu = map( iceil,qq)                      # integer ceilings of percentages
