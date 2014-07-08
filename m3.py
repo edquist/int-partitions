@@ -31,6 +31,7 @@ def ints2qq(ints, flags, P):
 
     S   = sum( d for d,f in int_flags if f is not "%"       )
     P  -= sum( d for d,f in int_flags if f is "%"           )
+    P  -= sum( 1 for d,f in int_flags if f is "+"           )
     S0  = sum( d for d,f in int_flags if f is None          )
     S2  = sum( d for d,f in int_flags if f not in ("@","%") )
     SP  = float(P)/S if S  else 0
@@ -40,6 +41,7 @@ def ints2qq(ints, flags, P):
         fail("this doesn't add up...")
 
     qq = [ 0       if flag is "!" else
+           1       if flag is "+" else
            d       if flag is "%" else
            d * SP  if flag is "@" else
            d * SP2 for d,flag in int_flags ]
@@ -89,7 +91,7 @@ def get_ints(seq, rx):
             yield line, hms2s(hms), flag1 or flag2
 
 def process_lines(seq):
-    rx = r'([@!%])?(\d+(?::\d+)*)([@!%])?'
+    rx = r'([@!%+])?(\d+(?::\d+)*)([@!%+])?'
     lines,ints,flags = zip(*get_ints(seq, rx))
     pp = ints2pp(ints, flags)
     return [ re.sub(rx, '%d%%' % p, line, 1)
