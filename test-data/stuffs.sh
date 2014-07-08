@@ -25,6 +25,7 @@ loggen int-partitions-basic.py intp
 loggen rounder.py rounder
 loggen rounder2.py rounder2
 loggen int-partitions-m3.py m3
+loggen tims.py tims
 
 # for x in {2..10}; do for n in $(ls -v $x); do ../int-partitions-basic.py < $x/$n | ../stats.py ; done >$x.intp.log & done; wait
 # for x in {2..10}; do for n in $(ls -v $x); do ../rounder.py < $x/$n | ../stats.py ; done >$x.rounder.log & done; wait
@@ -111,6 +112,8 @@ vs rounder intp
 vs intp m3
 vs rounder m3
 vs rounder rounder2
+vs rounder tims
+vs tims m3
 
-ma2 rounder intp m3
+ma2 rounder intp m3 tims
 
