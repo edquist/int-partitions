@@ -6,6 +6,7 @@ import os
 import math
 import itertools
 import getopt
+from fractions import Fraction as Q
 
 class Cfg:
     show_orig     = False
@@ -49,8 +50,8 @@ def ints2qq(ints, flags, P):
     P  -= sum( 1 for d,f in int_flags if f is "+"           )
     S0  = sum( d for d,f in int_flags if f is None          )
     S2  = sum( d for d,f in int_flags if f not in ("@","%") )
-    SP  = float(P)/S if S  else 0
-    SP2 = SP*S2/S0   if S0 else 0
+    SP  = Q(P,S)      if S  else 0
+    SP2 = SP*Q(S2,S0) if S0 else 0
 
     if P < 0:
         fail("this doesn't add up...")
@@ -76,7 +77,7 @@ def ints2pp(ints, flags=None, ops=Cfg()):
         qq = ints2qq(ints,flags,P)           # flag-adjusted raw percentages
     else:
         S  = sum(ints)
-        qq = [ float(d*P)/S for d in ints ]  # raw percentages
+        qq = [ Q(d*P,S) for d in ints ]      # raw percentages
         flags = (None,) * N
 
     rr = map(iround,qq)                      # rounded percentages
