@@ -69,12 +69,15 @@ def ints2pp(ints, flags=None, ops=Cfg()):
     N = len(ints)
     P = ops.P
 
+    if N == 0:
+        return []
+
     if flags:
         qq = ints2qq(ints,flags,P)           # flag-adjusted raw percentages
     else:
         S  = sum(ints)
         qq = [ float(d*P)/S for d in ints ]  # raw percentages
-        flags = [None] * N
+        flags = (None,) * N
 
     rr = map(iround,qq)                      # rounded percentages
     uu = map( iceil,qq)                      # integer ceilings of percentages
@@ -120,7 +123,7 @@ def get_ints(seq, rx):
 def process_lines(seq, ops=Cfg()):
     rx = r'([@!%])?(\d+(?::\d+)*)([@!%])?'
     repl = r'\2: %d%%' if ops.show_orig else r'%d%%'
-    lines,ints,flags = zip(*get_ints(seq, rx))
+    lines,ints,flags = zip(*get_ints(seq, rx)) or [[]]*3
     pp = ints2pp(ints, flags, ops)
     return [ re.sub(rx, repl % p, line, 1)
              for line,p,flag in zip(lines,pp,flags) if flag is not "!" ]
