@@ -34,17 +34,40 @@ def pdf(h):
     for k in sorted(h.keys()):
         print " %*s => %s" % (m, k, h[k])
 
+# or is it more like carrot juice?
+def carrot_cake(int_flags, S):
+    # me hates this...
+    for df in int_flags:
+        d,f = df
+        if f is "^":
+            if d >= S:
+                d,S = d-S,d
+                # S += d -= S
+                df[:] = d,None
+            else:
+                # S += d -= d
+                df[:] = 0,None
+                # or fail("this doesn't add up...")  # too much
+    return S
+
 #  flag adjusted raw percentage:
 #  !    -> 0% (to be amortized over non-flag items). only relevant with "@"
 #  @    -> % based on total, including "!" values (use for leave)
 #  %    -> fixed percentage, but doesn't contribute a number for "@"
 #  +    -> locked 1%, but value still goes toward total for the sake of "@"
+#  ^    -> take this number as the total, and use the remainder instead
 #  None -> amortized % for regular items
 
 def ints2qq(ints, flags, P):
-    int_flags = zip(ints,flags)
+    int_flags = map(list,zip(ints,flags))
 
-    S   = sum( d for d,f in int_flags if f is not "%"       )
+    S   = sum( d for d,f in int_flags if f not in ("^","%") )
+
+    S   = carrot_cake(int_flags, S)
+
+#   S   = carrot_cake(int_flags,
+#         sum( d for d,f in int_flags if f not in ("^","%") ) )
+
     P  -= sum( d for d,f in int_flags if f is "%"           )
     P  -= sum( 1 for d,f in int_flags if f is "+"           )
     S0  = sum( d for d,f in int_flags if f is None          )
@@ -53,7 +76,7 @@ def ints2qq(ints, flags, P):
     SP2 = SP*S2/S0   if S0 else 0
 
     if P < 0:
-        fail("this doesn't add up...")
+        fail("this doesn't add up...")  # too many
 
     qq = [ 0       if flag is "!" else
            1       if flag is "+" else
@@ -121,7 +144,7 @@ def get_ints(seq, rx):
             yield line, hms2s(hms), flag1 or flag2
 
 def process_lines(seq, ops=Cfg()):
-    rx = r'([@!%])?(\d+(?::\d+)*)([@!%])?'
+    rx = r'([@!%^])?(\d+(?::\d+)*)([@!%^])?'
     repl = r'\2: %d%%' if ops.show_orig else r'%d%%'
     lines,ints,flags = zip(*get_ints(seq, rx)) or [[]]*3
     pp = ints2pp(ints, flags, ops)
