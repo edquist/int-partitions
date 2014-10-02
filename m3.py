@@ -14,7 +14,7 @@ class Cfg:
     debug         = False
 
     def __str__(self):
-        return "<" + ', '.join([ "{}={}".format(x,getattr(self,x))
+        return "<" + ', '.join([ "{0}={1}".format(x,getattr(self,x))
             for x in dir(self) if not x.startswith('_') ]) + ">"
 
 # convenience functions
