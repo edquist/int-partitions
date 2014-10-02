@@ -13,6 +13,10 @@ class Cfg:
     P             = 100
     debug         = False
 
+    def __str__(self):
+        return "<" + ', '.join([ "{}={}".format(x,getattr(self,x))
+            for x in dir(self) if not x.startswith('_') ]) + ">"
+
 # convenience functions
 def     sgn(x): return -1 if x < 0 else 1
 def   iceil(x): return int(math.ceil(x))
@@ -85,6 +89,8 @@ def ints2qq(ints, flags, P):
            d * SP2 for d,flag in int_flags ]
 
     #print "sum(qq) = %.3f" % sum(qq)
+    pdf(vars())
+    print "..."
 
     return qq
 
@@ -120,8 +126,8 @@ def ints2pp(ints, flags=None, ops=Cfg()):
            rr[i] for i in ii ]
 
     if ops.debug:
-        print "-------"
         pdf(vars())
+        print "-------"
 
     # guarantee non-zero items produce non-zero percents
     if ops.keep_nonzeros:
