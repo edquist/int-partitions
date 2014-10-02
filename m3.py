@@ -67,10 +67,8 @@ def ints2qq(ints, flags, P):
 
     S   = sum( d for d,f in int_flags if f not in ("^","%") )
 
-    S   = carrot_cake(int_flags, S)
-
-#   S   = carrot_cake(int_flags,
-#         sum( d for d,f in int_flags if f not in ("^","%") ) )
+    if "^" in flags:
+        S = carrot_cake(int_flags, S)
 
     P  -= sum( d for d,f in int_flags if f is "%"           )
     P  -= sum( 1 for d,f in int_flags if f is "+"           )
