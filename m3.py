@@ -62,8 +62,9 @@ def carrot_cake(int_flags, S):
 #  ^    -> take this number as the total, and use the remainder instead
 #  None -> amortized % for regular items
 
-def ints2qq(ints, flags, P):
+def ints2qq(ints, flags, ops):
     int_flags = map(list,zip(ints,flags))
+    P = ops.P
 
     S   = sum( d for d,f in int_flags if f not in ("^","%") )
 
@@ -77,7 +78,10 @@ def ints2qq(ints, flags, P):
     SP  = float(P)/S if S  else 0
     SP2 = SP*S2/S0   if S0 else 0
 
-    if P < 0:
+    # it's not totally clear that this is the correct check, but it catches
+    # the case where [%+]'s take P down to 0, and there are still nonzero,
+    # non-flag items left.  (doesn't handle non-zero @'s though...)
+    if P < 0 or (P == 0 and S0 > 0 and ops.keep_nonzeros):
         fail("this doesn't add up...")  # too many
 
     qq = [ 0       if flag is "!" else
@@ -87,8 +91,9 @@ def ints2qq(ints, flags, P):
            d * SP2 for d,flag in int_flags ]
 
     #print "sum(qq) = %.3f" % sum(qq)
-    pdf(vars())
-    print "..."
+    if ops.debug:
+        pdf(vars())
+        print "..."
 
     return qq
 
@@ -100,7 +105,7 @@ def ints2pp(ints, flags=None, ops=Cfg()):
         return []
 
     if flags:
-        qq = ints2qq(ints,flags,P)           # flag-adjusted raw percentages
+        qq = ints2qq(ints,flags,ops)         # flag-adjusted raw percentages
     else:
         S  = sum(ints)
         qq = [ float(d*P)/S for d in ints ]  # raw percentages
