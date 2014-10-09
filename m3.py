@@ -80,6 +80,7 @@ def ints2qq(ints, flags, ops):
     SP2 = SP*S2/S0   if S0 else 0
 
     # we might be able to handle the keep_nonzeros stuff below, instead...
+#   if P < 0:
     if P < 0 or (P == 0 and S0 + S1 > 0 and ops.keep_nonzeros):
         fail("this doesn't add up...")  # too many
 
@@ -134,6 +135,9 @@ def ints2pp(ints, flags=None, ops=Cfg()):
     # guarantee non-zero items produce non-zero percents
     if ops.keep_nonzeros:
         f2 = tuple( '+' if qq[i] > 0 and pp[i] == 0 else flags[i] for i in ii )
+#       # this would work, except for ^'s ...
+#       f2 = tuple( '+' if ints[i] > 0 and pp[i] == 0 and flags[i] is not "!"
+#                       else flags[i] for i in ii )
         if f2 != flags:
             pp = ints2pp(ints, f2, ops)
 
