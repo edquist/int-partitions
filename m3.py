@@ -74,14 +74,13 @@ def ints2qq(ints, flags, ops):
     P  -= sum( d for d,f in int_flags if f is "%"           )
     P  -= sum( 1 for d,f in int_flags if f is "+"           )
     S0  = sum( d for d,f in int_flags if f is None          )
+    S1  = sum( d for d,f in int_flags if f is "@"           )
     S2  = sum( d for d,f in int_flags if f not in ("@","%") )
     SP  = float(P)/S if S  else 0
     SP2 = SP*S2/S0   if S0 else 0
 
-    # it's not totally clear that this is the correct check, but it catches
-    # the case where [%+]'s take P down to 0, and there are still nonzero,
-    # non-flag items left.  (doesn't handle non-zero @'s though...)
-    if P < 0 or (P == 0 and S0 > 0 and ops.keep_nonzeros):
+    # we might be able to handle the keep_nonzeros stuff below, instead...
+    if P < 0 or (P == 0 and S0 + S1 > 0 and ops.keep_nonzeros):
         fail("this doesn't add up...")  # too many
 
     qq = [ 0       if flag is "!" else
