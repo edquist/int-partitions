@@ -1,0 +1,6 @@
+#!/bin/bash
+
+{ tee /dev/fd/9 | m3.py | perl -pe 's/\b(\w+)/\u$1/g' | sort -Vr |
+awk 'NR==1 {print ""}; {print (length($1)==2 ? " -  " : " - ") $0}'
+} 9>&1 | cat
+
